@@ -1,1 +1,1 @@
-from .mainmenu import MainMenu
+from .titlescene import TitleScene

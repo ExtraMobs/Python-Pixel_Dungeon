@@ -1,5 +1,7 @@
 from io import BytesIO
 
+import pygame
+
 from gameengine import Resources
 
 
@@ -137,7 +139,6 @@ class Assets:
 
     @classmethod
     def init(cls):
-        print(cls.__dict__)
         for name, obj in cls.__dict__.items():
             if hasattr(obj, "ext"):
                 is_built_in = name[0:2] != "__" and name[-2:] != "__"
@@ -148,3 +149,39 @@ class Assets:
                         Resources.Surface.add_from_file(
                             "IMAGE_" + name, BytesIO(obj.data)
                         )
+
+        cls.BannerSprites.init()
+        cls.FireballSprites.init()
+
+    class BaseSprite:
+        @classmethod
+        def set(cls, resource_name, **name_image):
+            for key, value in name_image.items():
+                setattr(
+                    cls,
+                    key,
+                    Resources.Surface.slice(resource_name, pygame.Rect(*value))[0],
+                )
+
+    class BannerSprites(BaseSprite):
+        @classmethod
+        def init(cls):
+            cls.set(
+                "IMAGE_BANNERS",
+                PIXEL_DUNGEON=(0, 0, 128, 70),
+                BOSS_SLAIN=(0, 70, 128, 35),
+                GAME_OVER=(0, 105, 128, 35),
+                SELECT_YOUR_HERO=(0, 140, 128, 21),
+                PIXEL_DUNGEON_SIGNS=(0, 161, 128, 57),
+            )
+
+    class FireballSprites(BaseSprite):
+        @classmethod
+        def init(cls):
+            cls.set(
+                "IMAGE_FIREBALL",
+                BLIGHT=(0, 0, 32, 32),
+                FLIGHT=(32, 0, 32, 32),
+                FLAME1=(64, 0, 32, 32),
+                FLAME2=(96, 0, 32, 32),
+            )

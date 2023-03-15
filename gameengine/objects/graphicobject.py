@@ -1,6 +1,5 @@
 import pygame
 
-from ..display import Display
 from .standardobject import StandardObject
 
 

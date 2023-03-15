@@ -11,8 +11,12 @@ class Scene:
             self.children.append(child)
             child.parent = self
 
+    def remove_child(self, *children):
+        for child in children:
+            self.children.remove(child)
+
     def process(self, *args, **kwargs):
-        for child in self.children:
+        for child in list(self.children):
             child.process()
 
     def render(self, surface, background):

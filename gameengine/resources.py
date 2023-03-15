@@ -42,7 +42,12 @@ class Resources:
             cls.surfaces[name] = surface
 
         @classmethod
-        def get(cls, name, copy=False) -> pygame.Surface:
+        def slice(cls, name, *rects):
+            surface = cls.get(name)
+            return [surface.subsurface(rect).copy() for rect in rects]
+
+        @classmethod
+        def get(cls, name, copy=True) -> pygame.Surface:
             surface = cls.surfaces[name]
             if copy:
                 return surface.copy()

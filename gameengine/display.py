@@ -37,6 +37,10 @@ class Display:
     def height(self):
         return self.surface.get_height()
 
+    @classproperty
+    def rect(self):
+        return self.surface.get_rect()
+
     @classmethod
     def get_scale(self):
         return self.ref_scale.xy
@@ -58,3 +62,11 @@ class Display:
     @classmethod
     def update_display_from_window(cls):
         cls.set_scale(cls.ref_scale.xy)
+
+    @classmethod
+    def is_landscape(cls):
+        return cls.width > cls.height
+
+    @classmethod
+    def is_portrait(cls):
+        return not cls.is_landscape()

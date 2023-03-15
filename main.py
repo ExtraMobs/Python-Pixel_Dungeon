@@ -16,7 +16,7 @@ def main():
 
     init()
 
-    Engine.set_scene(scenes.MainMenu())
+    Engine.set_scene(scenes.TitleScene())
     Engine.start_loop()
 
 
