@@ -2,7 +2,6 @@ import pygame
 
 from .display import Display
 from .mouse import Mouse
-from .scene import Scene
 from .window import Window
 
 pygame.init()
@@ -60,7 +59,7 @@ class Engine:
         while True:
             cls.update_events()
 
-            if isinstance(cls.scene, Scene):
+            if cls.scene is not None:
                 cls.scene.process()
                 cls.draw_scene()
 
