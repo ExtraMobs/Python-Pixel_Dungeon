@@ -2,7 +2,7 @@ from io import BytesIO
 
 import pygame
 
-from gameengine import Resources
+from gameengine.resources import Resources
 
 
 class Assets:

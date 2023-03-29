@@ -2,12 +2,11 @@ import math
 
 import pygame
 
-from ._dev_utils import classproperty
+from ._dev_utils.classproperty import classproperty
 
 
 class Display:
     surface = None
-    background = None
     ref_scale = pygame.math.Vector2(1, 1)
 
     @classmethod

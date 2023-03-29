@@ -33,9 +33,11 @@ class Visual(Gizmo):
         self.acc = pygame.Vector2()
 
     @property
-    def scale(self):return self.__scale
-    
-    def set_scale(self, x, y): self.scale.xy = x, y
+    def scale(self):
+        return self.__scale
+
+    def set_scale(self, x, y):
+        self.scale.xy = x, y
 
     def update(self):
         self.update_motion()

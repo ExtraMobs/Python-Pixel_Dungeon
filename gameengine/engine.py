@@ -45,14 +45,14 @@ class Engine:
     @classmethod
     def draw_scene(cls):
         if Window.get_size() != Display.get_size():
-            cls.scene.render(Display.surface, Display.background)
+            Display.surface.fill((0, 0, 0))
             pygame.transform.scale(
                 Display.surface,
                 Window.size,
                 Window.surface,
             )
         else:
-            cls.scene.render(Window.surface, Display.background)
+            cls.scene.draw(Window.surface, Display.background)
 
     @classmethod
     def start_loop(cls):
@@ -60,7 +60,7 @@ class Engine:
             cls.update_events()
 
             if cls.scene is not None:
-                cls.scene.process()
+                cls.scene.update()
                 cls.draw_scene()
 
             pygame.display.update()

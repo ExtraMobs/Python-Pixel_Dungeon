@@ -1,10 +1,9 @@
+from gameengine.engine import Engine
+from noosa.group import Group
 from utils.random import Random
 
-from ...gameengine.engine import Engine
-from ..group import Group
 
-
-class ParticleEmitter(Group):
+class Emitter(Group):
     light_mode = False
 
     x = None

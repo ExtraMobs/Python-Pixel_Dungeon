@@ -1,6 +1,8 @@
 import math
+
 import screeninfo
-from gameengine import Display
+
+from gameengine.display import Display
 
 
 class Info:

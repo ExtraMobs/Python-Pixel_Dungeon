@@ -1,10 +1,9 @@
 from functools import lru_cache
 
 import pygame
-from gameengine import FRect
-from gameengine import Display
 
-from .visual import Visual
+from gameengine import Display, FRect
+from noosa.visual import Visual
 
 
 class Image(Visual):
@@ -26,7 +25,7 @@ class Image(Visual):
     def set_scale(self, x, y):
         super().set_scale(x, y)
         self.__texture = self.scale_surface(x, y)
-        
+
     @lru_cache
     def scale_surface(self, x, y):
         return pygame.transform.scale_by(self.__origin_texture, (x, y))
@@ -54,15 +53,15 @@ class Image(Visual):
     def copy(self, other):
         self.__origin_texture = other.texture
         self.frame = FRect(frect=other.frame)
-        
+
         self.width = other.width
         self.height = other.height
-    
+
         self.dirty = True
 
     def draw(self):
         super().draw()
-        
+
         if self.dirty:
             Display.surface.blit(self.__origin_texture, (self.x, self.y))
             self.dirty = False

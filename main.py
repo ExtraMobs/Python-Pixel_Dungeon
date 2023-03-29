@@ -1,7 +1,9 @@
-import scenes
 from assets import Assets
-from gameengine import Display, Engine, Window
+from gameengine.display import Display
+from gameengine.engine import Engine
+from gameengine.window import Window
 from info import Info
+from scenes.titlescene import TitleScene
 
 
 def init():
@@ -16,7 +18,7 @@ def main():
 
     init()
 
-    Engine.set_scene(scenes.TitleScene())
+    Engine.set_scene(TitleScene())
     Engine.start_loop()
 
 
