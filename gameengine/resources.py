@@ -33,10 +33,10 @@ class Resources:
 
         @classmethod
         def add_from_file(cls, name, path, alpha=True):
-            cls.add(name, cls.load_from_file(path, alpha))
+            cls.set(name, cls.load_from_file(path, alpha))
 
         @classmethod
-        def add(cls, name, surface, copy=False):
+        def set(cls, name, surface, copy=False):
             if copy:
                 surface = surface.copy()
             cls.surfaces[name] = surface
@@ -45,6 +45,10 @@ class Resources:
         def slice(cls, name, *rects):
             surface = cls.get(name)
             return [surface.subsurface(rect).copy() for rect in rects]
+
+        @classmethod
+        def contains(cls, key):
+            return key in cls.surfaces.keys()
 
         @classmethod
         def get(cls, name, copy=True) -> pygame.Surface:

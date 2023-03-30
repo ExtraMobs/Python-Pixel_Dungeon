@@ -2,8 +2,9 @@ from functools import lru_cache
 
 import pygame
 
-from gameengine import Display, FRect
+from gameengine.display import Display
 from noosa.visual import Visual
+import pygame
 
 
 class Image(Visual):
@@ -32,7 +33,7 @@ class Image(Visual):
 
     def set_texture(self, tx):
         self.__origin_texture = tx
-        self.set_frame(FRect(0, 0, 1, 1))
+        self.set_frame(pygame.FRect(0, 0, 1, 1))
         self.set_scale(*self.scale.xy)
 
     def get_texture(self):
@@ -45,14 +46,14 @@ class Image(Visual):
             self.width = frame.width
             self.height = frame.height
         elif None not in (left, top, width, height):
-            self.set_frame(FRect(left, top, left + width, top + height))
+            self.set_frame(pygame.FRect(left, top, width, height))
 
     def get_frame(self):
-        return FRect(frect=self.frame)
+        return pygame.FRect(frect=self.frame)
 
     def copy(self, other):
         self.__origin_texture = other.texture
-        self.frame = FRect(frect=other.frame)
+        self.frame = pygame.FRect(frect=other.frame)
 
         self.width = other.width
         self.height = other.height

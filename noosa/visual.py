@@ -2,7 +2,7 @@ import pygame
 
 from gameengine.engine import Engine
 from noosa.gizmo import Gizmo
-from utils import GameMath
+from utils.gamemath import GameMath
 
 
 class Visual(Gizmo):
