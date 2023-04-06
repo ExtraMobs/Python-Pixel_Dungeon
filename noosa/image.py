@@ -8,8 +8,8 @@ import pygame
 
 
 class Image(Visual):
-    __origin_texture = None
-    __texture = None
+    origin_texture = None
+    texture = None
     frame = None
 
     flip_horizontal = None
@@ -21,23 +21,25 @@ class Image(Visual):
         if tx is None:
             super().__init__(0, 0, 0, 0)
         else:
+            Image.__init__(self)
             self.set_texture(tx)
 
     def set_scale(self, x, y):
-        super().set_scale(x, y)
-        self.__texture = self.scale_surface(x, y)
+        self.scale.xy = x, y
+        self.texture = self.scale_surface(x, y)
+        self.update_frame()
 
     @lru_cache
     def scale_surface(self, x, y):
-        return pygame.transform.scale_by(self.__origin_texture, (x, y))
+        return pygame.transform.scale_by(self.origin_texture, (x, y))
+
+    def update_frame(self):
+        self.dirty = True
 
     def set_texture(self, tx):
-        self.__origin_texture = tx
+        self.origin_texture = tx
         self.set_frame(pygame.FRect(0, 0, 1, 1))
-        self.set_scale(*self.scale.xy)
-
-    def get_texture(self):
-        return self.__texture
+        self.set_scale(self.scale.x, self.scale.y)
 
     def set_frame(self, frame=None, left=None, top=None, width=None, height=None):
         if frame is not None:
@@ -45,6 +47,7 @@ class Image(Visual):
 
             self.width = frame.width
             self.height = frame.height
+            self.update_frame()
         elif None not in (left, top, width, height):
             self.set_frame(pygame.FRect(left, top, width, height))
 
@@ -52,17 +55,17 @@ class Image(Visual):
         return pygame.FRect(frect=self.frame)
 
     def copy(self, other):
-        self.__origin_texture = other.texture
+        self.origin_texture = other.texture
         self.frame = pygame.FRect(frect=other.frame)
 
         self.width = other.width
         self.height = other.height
 
-        self.dirty = True
+        self.update_frame()
 
-    def draw(self):
+    def draw(self, x=None, y=None):
         super().draw()
-
+        pos_to_draw = (self.x, self.y) if (None, None) == (x, y) else (x, y)
         if self.dirty:
-            Display.surface.blit(self.__origin_texture, (self.x, self.y))
+            Display.surface.blit(self.texture, pos_to_draw)
             self.dirty = False

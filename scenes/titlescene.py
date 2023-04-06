@@ -1,27 +1,31 @@
 from gameengine.engine import Engine
 from noosa.camera import Camera
+from pixeldungeon.ui.archs import Archs
 from scenes.pixelscene import PixelScene
 
 
 class TitleScene(PixelScene):
-    TXT_PLAY		= "Play"
-    TXT_HIGHSCORES	= "Rankings"
-    TXT_BADGES		= "Badges"
-    TXT_ABOUT		= "About"
+    TXT_PLAY = "Play"
+    TXT_HIGHSCORES = "Rankings"
+    TXT_BADGES = "Badges"
+    TXT_ABOUT = "About"
 
     def create(self):
         super().create()
-        
+
         # TODO
         # Music.INSTANCE.play( Assets.THEME, true );
-		# Music.INSTANCE.volume( 1f );
-  
+        # Music.INSTANCE.volume( 1f );
+
         self.ui_camera.visible = False
-        
+
         w = Camera.main.width
         h = Camera.main.height
-        
-        # archs = Archs()
+        print(w, h)
+
+        archs = Archs()
+        archs.set_size(w, h)
+        self.add(archs)
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)

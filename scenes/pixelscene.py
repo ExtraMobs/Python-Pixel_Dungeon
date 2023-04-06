@@ -1,6 +1,8 @@
 import math
 
 from assets import Assets
+from gameengine.display import Display
+from gameengine.engine import Engine
 from gameengine.window import Window
 from noosa.bitmaptext import BitmapText
 from noosa.bitmaptextmultiline import BitmapTextMultiline
@@ -186,9 +188,9 @@ class PixelScene(Scene):
 
         result = BitmapTextMultiline(text, cls.font)
         result.scale.update(cls.scale)
-        
+
         return result
-    
+
     @classmethod
     def align(cls, camera, pos, v=None):
         if v is None:
@@ -198,8 +200,9 @@ class PixelScene(Scene):
             c = v.get_camera()
             v.x = cls.align(c, v.x)
             v.y = cls.align(c, v.y)
-            
+
     no_fade = False
+
     def fade_in(self, color=None, light=None):
         if (color, light) == (None, None):
             if self.no_fade:
@@ -209,22 +212,36 @@ class PixelScene(Scene):
         else:
             self.add()
 
+    def draw(self):
+        Display.surface.fill((0, 0, 0))
+        super().draw()
+
     class Fader(ColorBlock):
         FADE_TIME = 1
-        
+
         light = None
-        
+
         time = None
-        
+
         def __init__(self, color, light, pixelscene) -> None:
             ui_camera = pixelscene.ui_camera
             super().__init__(ui_camera.width, ui_camera.height, color)
-            
+
             self.light = light
-            
+
             self.camera = ui_camera
-            
-            # self.
+            self.texture.set_alpha(255)
+            self.time = self.FADE_TIME
+
+        def update(self):
+            super().update()
+
+            self.time -= Engine.deltatime
+            if self.time <= 0:
+                self.texture.set_alpha(0)
+                self.parent.remove(self)
+            else:
+                self.texture.set_alpha((self.time / self.FADE_TIME) * 255)
 
     class PixelCamera(Camera):
         def __init__(self, zoom):

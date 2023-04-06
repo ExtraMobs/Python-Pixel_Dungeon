@@ -11,6 +11,7 @@ def main():
     scene = TitleScene()
     scene.create()
     Engine.set_scene(scene)
+    Engine.set_framerate(60)
     Engine.start_loop()
 
 

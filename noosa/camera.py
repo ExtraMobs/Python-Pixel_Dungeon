@@ -2,6 +2,8 @@ import math
 
 import pygame
 
+from gameengine._dev_utils.classproperty import classproperty
+from gameengine.display import Display
 from gameengine.engine import Engine
 from gameengine.window import Window
 from noosa._utils import Array
@@ -49,7 +51,7 @@ class Camera(Gizmo):
                 camera.destroy()
             cls.all.clear()
 
-            cls.main = cls.add(new_camera)
+            cls.set_main(cls.add(new_camera))
             return cls.main
 
     @classmethod
@@ -103,6 +105,8 @@ class Camera(Gizmo):
             self.width = self.screen_width // self.zoom
             self.height = self.screen_height // self.zoom
             self.focus_on(fx, fy)
+            if self == Camera.main:
+                Display.set_scale(value)
 
     def resize(self, width, height):
         self.width = width
@@ -169,3 +173,12 @@ class Camera(Gizmo):
     def shake(self, magnitude, duration):
         self.shake_mag_x = self.shake_mag_y = magnitude
         self.shake_time = self.shake_duration = duration
+
+    @classmethod
+    def get_main(cls):
+        return cls.main
+
+    @classmethod
+    def set_main(cls, value):
+        Display.set_scale(value.zoom)
+        cls.main = value

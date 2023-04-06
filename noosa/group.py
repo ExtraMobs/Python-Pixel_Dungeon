@@ -4,38 +4,40 @@ from utils.random import Random
 
 
 class Group(Gizmo):
-    _members = Array()
+    def __init__(self):
+        super().__init__()
+        self.members = Array()
 
     @property
     def length(self):
-        return len(self._members)
+        return len(self.members)
 
     def destroy(self):
-        for g in self._members:
+        for g in self.members:
             if g is not None:
                 g.destroy()
 
-        self._members = None
+        self.members = None
 
     def update(self):
-        for g in self._members:
+        for g in self.members:
             if g is not None and g.exists and g.visible:
                 g.update()
 
     def draw(self):
-        for g in self._members:
+        for g in self.members:
             if g is not None and g.exists and g.visible:
                 g.draw()
 
     def kill(self):
-        for g in self._members:
+        for g in self.members:
             if g is not None and g.exists:
                 g.kill()
 
         super().kill()
 
     def index_of(self, g):
-        return self._members.index(g)
+        return self.members.index(g)
 
     def add(self, g):
         if g.parent == self:
@@ -45,13 +47,13 @@ class Group(Gizmo):
             g.parent.remove(g)
 
         # Trying to find an empty space for a new member
-        for index, member in enumerate(self._members):
-            if member is not None:
-                self._members[index] = g
+        for index, member in enumerate(self.members):
+            if member is None:
+                self.members[index] = g
                 g.parent = self
                 return g
 
-        self._members.append(g)
+        self.members.append(g)
         g.parent = self
         return g
 
@@ -63,12 +65,12 @@ class Group(Gizmo):
         if g.parent is not None:
             g.parent.remove(g)
 
-        if self._members[0] == None:
-            self._members[0] = g
+        if self.members[0] == None:
+            self.members[0] = g
             g.parent = self
             return g
 
-        self._members.insert(0, g)
+        self.members.insert(0, g)
         g.parent = self
         return g
 
@@ -89,7 +91,7 @@ class Group(Gizmo):
     def erase(self, g):
         index = self.index_of(g)
         if index != -1:
-            self._members[index] = None
+            self.members[index] = None
             g.parent = None
             return g
         else:
@@ -97,7 +99,7 @@ class Group(Gizmo):
 
     # Real removal
     def remove(self, g):
-        if self._members.remove():
+        if self.members.remove():
             g.parent = None
             return g
         else:
@@ -106,7 +108,7 @@ class Group(Gizmo):
     def replace(self, old_one, new_one):
         index = self.index_of(old_one)
         if index != -1:
-            self._members[index] = new_one
+            self.members[index] = new_one
             new_one.parent = self
             old_one.parent = None
             return new_one
@@ -114,7 +116,7 @@ class Group(Gizmo):
             return None
 
     def get_first_available(self, c):
-        for g in self._members:
+        for g in self.members:
             if g != None and not g.exists and ((c is None) or g.__class__ == c):
                 return g
         return None
@@ -122,7 +124,7 @@ class Group(Gizmo):
     def count_living(self):
         count = 0
 
-        for g in self._members:
+        for g in self.members:
             if g is not None and g.exists and g.alive:
                 count += 1
 
@@ -131,7 +133,7 @@ class Group(Gizmo):
     def count_dead(self):
         count = 0
 
-        for g in self._members:
+        for g in self.members:
             if g is not None and not g.alive:
                 count += 1
 
@@ -139,28 +141,28 @@ class Group(Gizmo):
 
     def random(self):
         if self.length > 0:
-            return self._members[Random.from_max_int(self.length)]
+            return self.members[Random.from_max_int(self.length)]
         else:
             return None
 
     def clear(self):
-        for g in self._members:
+        for g in self.members:
             if g is not None:
                 g.parent = None
-        self._members.clear()
+        self.members.clear()
 
     def bring_to_front(self, g):
-        if g in self._members:
-            self._members.remove(g)
-            self._members.append(g)
+        if g in self.members:
+            self.members.remove(g)
+            self.members.append(g)
             return g
         else:
             return None
 
     def send_to_back(self, g):
-        if g in self._members:
-            self._members.remove(g)
-            self._members.insert(0, g)
+        if g in self.members:
+            self.members.remove(g)
+            self.members.insert(0, g)
             return g
         else:
             return None

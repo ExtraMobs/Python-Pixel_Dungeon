@@ -11,14 +11,14 @@ class Visual(Gizmo):
     width = None
     height = None
 
-    __scale = None
+    __scale = pygame.Vector2(1)
     origin = None
 
     speed = None
     acc = None
 
-    angle = None
-    angular_speed = None
+    angle = 0
+    angular_speed = 0
 
     def __init__(self, x, y, width, height) -> None:
         self.x = x
@@ -26,18 +26,15 @@ class Visual(Gizmo):
         self.width = width
         self.height = height
 
-        self.__scale = pygame.Vector2(1)
         self.origin = pygame.Vector2()
 
         self.speed = pygame.Vector2()
         self.acc = pygame.Vector2()
+        super().__init__()
 
     @property
     def scale(self):
         return self.__scale
-
-    def set_scale(self, x, y):
-        self.scale.xy = x, y
 
     def update(self):
         self.update_motion()
@@ -73,7 +70,9 @@ class Visual(Gizmo):
         d = GameMath.speed(self.speed.y, self.acc.y) - self.speed.y / 2
         self.speed.y += d
         self.y += self.speed.x * Engine.deltatime
-        self.speed.xy += d
+        self.speed.y += d
+
+        self.angle += self.angular_speed * Engine.deltatime
 
     # def alpha(self, value=None): O que diabos vou fazer com isso???
 
