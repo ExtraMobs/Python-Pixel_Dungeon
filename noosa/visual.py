@@ -17,6 +17,15 @@ class Visual(Gizmo):
     speed = None
     acc = None
 
+    rm = None
+    gm = None
+    bm = None
+    am = None
+    ra = None
+    ga = None
+    ba = None
+    aa = None
+
     angle = 0
     angular_speed = 0
 
@@ -27,6 +36,8 @@ class Visual(Gizmo):
         self.height = height
 
         self.origin = pygame.Vector2()
+
+        self.reset_color()
 
         self.speed = pygame.Vector2()
         self.acc = pygame.Vector2()
@@ -74,7 +85,69 @@ class Visual(Gizmo):
 
         self.angle += self.angular_speed * Engine.deltatime
 
-    # def alpha(self, value=None): O que diabos vou fazer com isso???
+    def get_alpha(self):
+        return self.am + self.aa
+
+    def set_alpha(self, value):
+        self.am = value
+        self.aa = 0
+
+    def invert(self):
+        self.rm = self.gm = self.bm = -1
+        self.ra = self.ga = self.ba = 1
+
+    def lightness(self, value):
+        if value < 0.5:
+            self.rm = self.gm = self.bm = value * 2
+            self.ra = self.ga = self.ba = 0
+        else:
+            self.rm = self.gm = self.bm = 2 - value * 2
+            self.ra = self.ga = self.ba = value * 2 - 1
+
+    def brightness(self, value):
+        self.rm = self.gm = self.bm = value
+
+    def tint_rgb(self, r, g, b, strength):
+        self.rm = self.gm = self.bm = 1 - strength
+        self.ra = r * strength
+        self.ga = g * strength
+        self.ba = b * strength
+
+    def tint_color(self, color, strength):
+        self.rm = self.gm = self.bm = 1 - strength
+        self.ra = ((color >> 16) & 0xFF) / 255 * strength
+        self.ga = ((color >> 8) & 0xFF) / 255 * strength
+        self.ba = (color & 0xFF) / 255 * strength
+
+    def set_color_rgb(self, r, g, b):
+        self.rm = self.gm = self.bm = 0
+        self.ra = r
+        self.ga = g
+        self.ba = b
+
+    def set_color(self, color):
+        self.set_color_rgb(
+            ((color >> 16) & 0xFF) / 255,
+            ((color >> 8) & 0xFF) / 255,
+            (color & 0xFF) / 255,
+        )
+
+    def hardlight_rgb(self, r, g, b):
+        self.ra, self.ga, self.ba = 0
+        self.rm = r
+        self.gm = g
+        self.bm = b
+
+    def hardlight_color(self, color):
+        self.hardlight_rgb(
+            ((color >> 16) & 0xFF) / 255,
+            ((color >> 8) & 0xFF) / 255,
+            (color & 0xFF) / 255,
+        )
+
+    def reset_color(self):
+        self.rm = self.gm = self.bm = self.am = 1
+        self.ra = self.ga = self.ba = self.aa = 0
 
     def overlap_point(self, x, y):
         return (

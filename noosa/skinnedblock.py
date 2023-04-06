@@ -50,23 +50,28 @@ class SkinnedBlock(Image):
     def set_scale(self, x, y):
         super().set_scale(x, y)
 
+    def get_skinned_surface(self):
+        o_w = self.origin_texture.get_width()
+        o_h = self.origin_texture.get_height()
+        s_w = math.ceil(self.width / o_w) + 1
+        s_h = math.ceil(self.height / o_h) + 1
+        surface = ResourceCache.create_solid(
+            (0, 0, 0, 0), (s_w * o_w, s_h * o_h)
+        ).copy()
+        for y in range(s_h):
+            y *= o_h
+            for x in range(s_w):
+                x *= o_w
+                surface.blit(self.texture, (x, y))
+        return surface
+
     def set_size(self, w, h):
         if (w, h) != (self.width, self.height):
-            o_w = self.origin_texture.get_width()
-            o_h = self.origin_texture.get_height()
-            s_w = math.ceil(w / o_w) + 1
-            s_h = math.ceil(h / o_h) + 1
-            surface = ResourceCache.create_solid(
-                (0, 0, 0, 0), (s_w * o_w, s_h * o_h)
-            ).copy()
-            for y in range(s_h):
-                y *= o_h
-                for x in range(s_w):
-                    x *= o_w
-                    surface.blit(self.origin_texture, (x, y))
             self.width = w
             self.height = h
-            self.texture = surface
+            self.apply_filters(**self.filters_)
+            self.filters_.clear()
+            self.texture = self.get_skinned_surface()
             self.update_frame()
 
     def draw(self):
