@@ -17,8 +17,6 @@ class Image(Visual):
     flip_horizontal = None
     flip_vertical = None
 
-    dirty = None
-
     def __init__(self, tx=None) -> None:
         if tx is None:
             super().__init__(0, 0, 0, 0)
@@ -40,7 +38,13 @@ class Image(Visual):
                 self.apply_scale()
 
     def apply_scale(self):
-        self.texture = self.scale_surface(
+        @lru_cache
+        def scale_surface(surface_buffer, surface_size, x, y):
+            return pygame.transform.scale_by(
+                pygame.image.frombytes(surface_buffer, surface_size, "RGBA"), (x, y)
+            )
+
+        self.texture = scale_surface(
             pygame.image.tobytes(self.texture, "RGBA"),
             self.texture.get_size(),
             self.scale.x,
@@ -80,20 +84,10 @@ class Image(Visual):
         del img
         del img_alpha
 
-    @lru_cache
-    def scale_surface(self, surface_buffer, surface_size, x, y):
-        return pygame.transform.scale_by(
-            pygame.image.frombytes(surface_buffer, surface_size, "RGBA"), (x, y)
-        )
-
-    def update(self):
-        super().update()
-        if len(self.filters_) > 0:
-            self.apply_filters(**self.filters_)
-            self.filters_.clear()
-
     def update_frame(self):
-        self.dirty = True
+        texture = self.texture if self.texture is not None else self.origin_texture
+        self.width = self.frame.width * texture.get_width()
+        self.height = self.frame.height * texture.get_height()
 
     def set_scale(self, x, y):
         self.scale.xy = x, y
@@ -116,8 +110,6 @@ class Image(Visual):
         if frame is not None:
             self.frame = frame
 
-            self.width = frame.width
-            self.height = frame.height
             self.update_frame()
         elif None not in (left, top, width, height):
             self.set_frame(pygame.FRect(left, top, width, height))
@@ -136,10 +128,11 @@ class Image(Visual):
 
     def draw(self, x=None, y=None):
         super().draw()
+        if len(self.filters_) > 0:
+            self.apply_filters(**self.filters_)
+            self.filters_.clear()
         pos_to_draw = (self.x, self.y) if (None, None) == (x, y) else (x, y)
-        if self.dirty:
-            Display.surface.blit(self.texture, pos_to_draw)
-            self.dirty = False
+        Display.surface.blit(self.texture, pos_to_draw)
 
     def set_alpha(self, value):
         super().set_alpha(value)

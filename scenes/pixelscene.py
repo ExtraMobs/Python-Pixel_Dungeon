@@ -192,11 +192,11 @@ class PixelScene(Scene):
         return result
 
     @classmethod
-    def align(cls, camera, pos, v=None):
-        if v is None:
+    def align(cls, camera=None, pos=None, v=None):
+        if pos is not None:
             zoom = cls.default_zoom if camera is None else camera.zoom
             return int(pos * zoom) / zoom
-        else:
+        elif v is not None:
             c = v.get_camera()
             v.x = cls.align(c, v.x)
             v.y = cls.align(c, v.y)

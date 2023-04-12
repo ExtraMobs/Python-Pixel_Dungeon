@@ -10,8 +10,6 @@ class BitmapText(Visual):
 
     real_length = None
 
-    dirty = None
-
     def __init__(self, text=None, font=None) -> None:
         if (text, font) == (None, None):
             self.__init__("", None)
@@ -30,7 +28,6 @@ class BitmapText(Visual):
     def draw(self):
         if self.dirty:
             Display.surface.blit(self.__origin_texture, (self.x, self.y))
-            self.dirty = False
 
     class Font(TextureFilm):
         LATIN_UPPER = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -52,7 +49,6 @@ class BitmapText(Visual):
         def split_by(self, bitmap, height, color, chars):
             color = pygame.Color(color)
             self.auto_uppercase = chars == self.LATIN_UPPER
-            lenght = len(chars)
 
             width = bitmap.get_width()
             v_height = height / bitmap.get_height()

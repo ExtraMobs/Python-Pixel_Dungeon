@@ -6,7 +6,7 @@ from gameengine.resources import Resources
 
 class ResourceCache:
     @staticmethod
-    def get(asset_key):
+    def get(asset_key) -> pygame.Surface:
         if not Resources.Surface.contains(asset_key):
             Resources.Surface.add_from_file(
                 asset_key, os.path.join(os.path.abspath("assets"), asset_key)
@@ -14,7 +14,7 @@ class ResourceCache:
         return Resources.Surface.get(asset_key, False)
 
     @staticmethod
-    def create_solid(color, size=(1, 1)):
+    def create_solid(color, size=(1, 1)) -> pygame.Surface:
         key = f"{size[0]}x{size[1]}]:" + str(color)
         if not Resources.Surface.contains(color):
             color = pygame.Color(color)

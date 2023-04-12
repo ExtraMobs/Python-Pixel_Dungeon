@@ -15,15 +15,8 @@ class SkinnedBlock(Image):
     def __init__(self, width, height, tx) -> None:
         super().__init__(tx)
         self.set_size(width, height)
-
-    def set_frame(self, frame=None):
-        self.scale.x = 1
-        self.scale.y = 1
-
         self.offset_x = 0
         self.offset_y = 0
-
-        super().set_frame(pygame.FRect(0, 0, 1, 1))
 
     def update_frame(self):
         super().update_frame()
