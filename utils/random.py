@@ -3,6 +3,10 @@ import random
 
 class Random:
     @staticmethod
+    def float():
+        return random.random()
+
+    @staticmethod
     def from_max_float(a):
         return a * random.random()
 

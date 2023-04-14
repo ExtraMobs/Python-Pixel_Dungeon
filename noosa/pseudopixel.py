@@ -1,6 +1,7 @@
 import pygame
 
 from noosa.image import Image
+from utils.resourcecache import ResourceCache
 
 
 class PseudoPixel(Image):
@@ -10,13 +11,15 @@ class PseudoPixel(Image):
 
             self.x = x
             self.y = y
-            self.get_texture().fill(color)
+            self.set_color(color)
         else:
-            super().__init__(pygame.Surface(1, 1))
-            self.get_texture().fill((255, 255, 255))
+            super().__init__(ResourceCache.create_solid(0xFFFFFFFF))
 
     def set_size(self, w=None, h=None, value=None):
         if None not in (w, h):
             self.set_scale(w, h)
         else:
-            self.set_scale(value.x, value.y)
+            if type(value) is int:
+                self.set_scale(value, value)
+            else:
+                self.set_scale(value.x, value.y)

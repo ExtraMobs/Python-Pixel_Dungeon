@@ -29,14 +29,15 @@ class Emitter(Group):
         if p is not None:
             self.x, self.y, self.width, self.height = p
         else:
-            if x is None:
-                self.x = 0
-            if y is None:
-                self.y = 0
-            if width is None:
-                self.y = 0
-            if height is None:
-                self.height = 0
+            self.x, self.y, self.width, self.height = x, y, width, height
+        if self.x is None:
+            self.x = 0
+        if self.y is None:
+            self.y = 0
+        if self.width is None:
+            self.width = 0
+        if self.height is None:
+            self.height = 0
         self.target = None
 
     def burst(self, factory, quantity):

@@ -8,6 +8,7 @@ from noosa.camera import Camera
 from noosa.image import Image
 from noosa.ui.button import Button
 from pixeldungeon.effects.bannersprites import BannerSprites
+from pixeldungeon.effects.fireball import Fireball
 from pixeldungeon.ui.archs import Archs
 from scenes.pixelscene import PixelScene
 from utils.resourcecache import ResourceCache
@@ -46,10 +47,17 @@ class TitleScene(PixelScene):
         title.x = (w - title.get_width()) / 2
         title.y = (h - height) / 2
 
+        self.place_torch(title.x + 18, title.y + 20)
+
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         if Engine.request_quit:
             Engine.system_exit()
+
+    def place_torch(self, x, y):
+        fb = Fireball()
+        fb.set_pos(x, y)
+        self.add(fb)
 
     class DashboardItem(Button):
         SIZE = 48

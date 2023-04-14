@@ -80,11 +80,8 @@ class Group(Gizmo):
             return g
         elif c is None:
             return None
-        else:
-            try:
-                return self.add(c.__class__())
-            except Exception as e:
-                print(e.with_traceback())
+        elif isinstance(c, type):
+            return self.add(c())
         return None
 
     # Fast removal - replacing with null
