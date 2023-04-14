@@ -1,5 +1,3 @@
-import pygame
-
 from noosa.image import Image
 from utils.resourcecache import ResourceCache
 

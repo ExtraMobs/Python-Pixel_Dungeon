@@ -13,6 +13,7 @@ class Image(Visual):
     filters_ = None
     texture = None
     frame = None
+    int_frame = None
 
     flip_horizontal = None
     flip_vertical = None
@@ -27,7 +28,7 @@ class Image(Visual):
 
     def apply_filters(self, all_=False, scale=False, colors=False, reset_surface=True):
         if reset_surface:
-            self.texture = self.origin_texture.copy()
+            self.texture = self.origin_texture.subsurface(self.int_frame)
         if all_:
             self.apply_colors()
             self.apply_scale()
@@ -69,18 +70,21 @@ class Image(Visual):
 
         for position in self.mask:
             x, y = position
-            color = img[x][y]
-            alpha = img_alpha[x][y]
+            if self.int_frame.collidepoint(x, y):
+                x -= self.int_frame.x
+                y -= self.int_frame.y
+                color = img[x][y]
+                alpha = img_alpha[x][y]
 
-            r, g, b, a = get_color(
-                (*color, alpha),
-                (self.rm, self.gm, self.bm, self.am),
-                (self.ra, self.ga, self.ba, self.aa),
-            )
-            color[0] = r
-            color[1] = g
-            color[2] = b
-            img_alpha[x][y] = a
+                r, g, b, a = get_color(
+                    (*color, alpha),
+                    (self.rm, self.gm, self.bm, self.am),
+                    (self.ra, self.ga, self.ba, self.aa),
+                )
+                color[0] = r
+                color[1] = g
+                color[2] = b
+                img_alpha[x][y] = a
         del img
         del img_alpha
 
@@ -101,7 +105,7 @@ class Image(Visual):
             (x, y)
             for x in range(tx.get_width())
             for y in range(tx.get_height())
-            if self.mask.get_at((x, y))
+            if self.mask.get_at((x, y)) == 1
         ]
         self.set_frame(pygame.FRect(0, 0, 1, 1))
         self.filters_["all_"] = True
@@ -109,6 +113,11 @@ class Image(Visual):
     def set_frame(self, frame=None, left=None, top=None, width=None, height=None):
         if frame is not None:
             self.frame = frame
+            w, h = self.origin_texture.get_size()
+            x, y = self.frame.x * w, self.frame.y * h
+            r, l = self.frame.width * w, self.frame.height * h
+            w, h = max(x, r) - min(x, r), max(y, l) - min(y, l)
+            self.int_frame = pygame.Rect(x, y, w, h)
 
             self.update_frame()
         elif None not in (left, top, width, height):

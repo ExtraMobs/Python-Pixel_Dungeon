@@ -80,9 +80,8 @@ class Group(Gizmo):
             return g
         elif c is None:
             return None
-        elif isinstance(c, type):
+        else:
             return self.add(c())
-        return None
 
     # Fast removal - replacing with null
     def erase(self, g):
@@ -114,7 +113,7 @@ class Group(Gizmo):
 
     def get_first_available(self, c):
         for g in self.members:
-            if g != None and not g.exists and ((c is None) or g.__class__ == c):
+            if g is not None and not g.exists and ((c is None) or g.__class__ == c):
                 return g
         return None
 

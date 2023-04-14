@@ -27,7 +27,7 @@ class PixelParticle(PseudoPixel):
         super().update()
         self.left -= Engine.deltatime
         if self.left <= 0:
-            self.kill()  # atenção
+            self.kill()
 
 
 class Shrinking(PixelParticle):

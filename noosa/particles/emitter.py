@@ -90,7 +90,8 @@ class Emitter(Group):
 
     class Factory:
         # abstract
-        def emit(self, index, x, y):
+        @staticmethod
+        def emit(emitter, index, x, y):
             ...
 
         def light_mode(self):

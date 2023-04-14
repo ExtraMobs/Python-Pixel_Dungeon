@@ -32,7 +32,7 @@ class Fireball(Component):
         self.add(self.sparks)
 
         self.b_light = Image(ResourceCache.get(Assets.FIREBALL))
-        self.b_light.set_frame(self.b_light)
+        self.b_light.set_frame(self.BLIGHT)
         self.b_light.origin.update(self.b_light.width / 2)
         self.b_light.angular_speed = -90
         self.add(self.b_light)
