@@ -13,7 +13,7 @@ class Window:
 
     @classmethod
     def set_size(cls, size, *flags):
-        flag = 0
+        flag = pygame.SRCALPHA
         for f in flags:
             flag |= f
         cls.surface = pygame.display.set_mode(size, flag)

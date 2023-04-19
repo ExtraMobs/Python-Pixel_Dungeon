@@ -1,7 +1,5 @@
 import math
 
-import pygame
-
 from noosa.image import Image
 from utils.resourcecache import ResourceCache
 
@@ -68,4 +66,5 @@ class SkinnedBlock(Image):
             self.update_frame()
 
     def draw(self):
+        self.filters_["reset_surface"] = False
         super().draw(-self.offset_x, -self.offset_y)

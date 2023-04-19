@@ -1,12 +1,13 @@
+import numpy
 import pygame
 
 from gameengine.display import Display
 from noosa.visual import Visual
-from utils.cache import cache_color, cache_surface
 
 
 class Image(Visual):
     origin_texture = None
+    origin_texture_backup = None
     mask = None
     filters_ = None
     texture = None
@@ -16,6 +17,23 @@ class Image(Visual):
     flip_horizontal = None
     flip_vertical = None
 
+    old_data = [None, None, None]  # last_int_frame  # colors_m  # colors_a
+    data_equals = False
+
+    def get_current_data(self):
+        return [
+            self.int_frame,
+            (self.rm, self.gm, self.bm, self.am),
+            (self.ra, self.ga, self.ba, self.aa),
+        ]
+
+    def check_data_equality(self):
+        if self.old_data != [current_data := self.get_current_data()]:
+            self.old_data = current_data
+            self.data_equals = False
+        else:
+            self.data_equals = True
+
     def __init__(self, tx=None) -> None:
         if tx is None:
             super().__init__(0, 0, 0, 0)
@@ -24,70 +42,51 @@ class Image(Visual):
             Image.__init__(self)
             self.set_texture(tx)
 
-    def apply_filters(self, all_=False, scale=False, colors=False, reset_surface=True):
+    def apply_filters(
+        self, all_=False, scale=False, rotate=False, colors=False, reset_surface=True
+    ):
         if reset_surface:
             self.texture = self.origin_texture.subsurface(self.int_frame)
         if all_:
             self.apply_colors()
+            self.apply_rotation()
             self.apply_scale()
         else:
             if colors:
                 self.apply_colors()
+            if rotate:
+                self.apply_rotation()
             if scale:
                 self.apply_scale()
 
     def apply_scale(self):
-        @cache_surface
         def scale_surface(surface, x, y):
             return pygame.transform.scale_by(surface, (x, y))
 
-        self.texture = scale_surface(self.texture, self.scale.x, self.scale.y)
-
-    def apply_colors(self):
-        @cache_color
-        def get_color(rgba, rmgmbmam, ragabaaa):
-            r, g, b, a = rgba
-            rm, gm, bm, am = rmgmbmam
-            ra, ga, ba, aa = ragabaaa
-            return (
-                r * rm + (ra * 255),
-                g * gm + (ga * 255),
-                b * bm + (ba * 255),
-                a * am + (aa * 255),
+        if tuple(self.scale) != (1, 1):
+            self.texture = scale_surface(
+                self.texture, round(self.scale.x, 2), round(self.scale.y, 2)
             )
 
+    def apply_rotation(self):
+        def rotate_surface(surface, angle):
+            return pygame.transform.rotate(surface, angle)
+
+        if self.angle != 0:
+            self.texture = rotate_surface(self.texture, round(self.angle))
+
+    def apply_colors(self):
+        self.texture.blit(self.origin_texture_backup, (0, 0), self.int_frame)
         img = pygame.surfarray.pixels3d(self.texture)
+        w, h, _ = img.shape
+        r = w + self.int_frame.x
+        l = h + self.int_frame.y
         img_alpha = pygame.surfarray.pixels_alpha(self.texture)
-
-        for position in self.mask:
-            x, y = position
-            if self.int_frame.collidepoint(x, y):
-                x -= self.int_frame.x
-                y -= self.int_frame.y
-                color = img[x][y]
-                alpha = img_alpha[x][y]
-
-                r, g, b, a = get_color(
-                    (*color, alpha),
-                    (
-                        round(self.rm, 2),
-                        round(self.gm, 2),
-                        round(self.bm, 2),
-                        round(self.am, 2),
-                    ),
-                    (
-                        round(self.ra, 2),
-                        round(self.ga, 2),
-                        round(self.ba, 2),
-                        round(self.aa, 2),
-                    ),
-                )
-                color[0] = r
-                color[1] = g
-                color[2] = b
-                img_alpha[x][y] = a
-            elif x > self.int_frame.x and y > self.int_frame.y:
-                break
+        if not self.data_equals:
+            numpy.multiply(img, (self.rm, self.gm, self.bm), img, casting="unsafe")
+            numpy.add(img, self.am)
+            numpy.multiply(img_alpha, self.am, img_alpha, casting="unsafe")
+            numpy.add(img_alpha, self.aa, img_alpha)
         del img
         del img_alpha
 
@@ -98,11 +97,18 @@ class Image(Visual):
 
     def set_scale(self, x, y):
         self.scale.xy = x, y
+        self.filters_["rotate"] = True
         self.filters_["scale"] = True
         self.update_frame()
 
+    def set_angle(self, new_angle):
+        super().set_angle(new_angle)
+        self.filters_["rotate"] = True
+        self.filters_["scale"] = True
+
     def set_texture(self, tx):
         self.origin_texture = tx
+        self.origin_texture_backup = tx.copy()
         self.mask = pygame.mask.from_surface(tx, 0)
         self.mask = [
             (x, y)
@@ -131,12 +137,16 @@ class Image(Visual):
 
     def copy(self, other):
         self.origin_texture = other.texture
+        self.origin_texture_backup = other.texture.copy()
         self.frame = pygame.FRect(frect=other.frame)
 
         self.width = other.width
         self.height = other.height
 
         self.update_frame()
+
+    def update(self):
+        super().update()
 
     def draw(self, x=None, y=None):
         super().draw()
@@ -148,40 +158,46 @@ class Image(Visual):
 
     def set_alpha(self, value):
         super().set_alpha(value)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def invert(self):
         super().invert()
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def lightness(self, value):
         super().lightness(value)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def tint_rgb(self, r, g, b, strength):
         super().tint_rgb(r, g, b, strength)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def tint_color(self, color, strength):
         super().tint_color(color, strength)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def set_color_rgb(self, r, g, b):
         super().set_color_rgb(r, g, b)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def set_color(self, color):
         super().set_color(color)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def hardlight_rgb(self, r, g, b):
         super().hardlight_rgb(r, g, b)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def hardlight_color(self, color):
         super().hardlight_color(color)
-        self.filters_["all_"] = True
+        self._update_filter_color()
 
     def reset_color(self):
         super().reset_color()
+        self._update_filter_color()
+
+    def _update_filter_color(self):
         self.filters_["all_"] = True
+        self.check_data_equality()
+        if self.data_equals and self.texture is not None:
+            self.filters_["reset_surface"] = False

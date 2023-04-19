@@ -11,7 +11,7 @@ class Visual(Gizmo):
     width = None
     height = None
 
-    __scale = pygame.Vector2(1)
+    scale = None
     origin = None
 
     speed = None
@@ -39,13 +39,11 @@ class Visual(Gizmo):
 
         self.reset_color()
 
+        self.scale = pygame.Vector2(1)
+
         self.speed = pygame.Vector2()
         self.acc = pygame.Vector2()
         super().__init__()
-
-    @property
-    def scale(self):
-        return self.__scale
 
     def update(self):
         self.update_motion()
@@ -67,10 +65,10 @@ class Visual(Gizmo):
             return p
 
     def get_width(self):
-        return self.width * self.__scale.x
+        return self.width * self.scale.x
 
     def get_height(self):
-        return self.height * self.__scale.y
+        return self.height * self.scale.y
 
     def update_motion(self):
         d = GameMath.speed(self.speed.x, self.acc.x) - self.speed.x / 2
@@ -83,7 +81,13 @@ class Visual(Gizmo):
         self.y += self.speed.x * Engine.deltatime
         self.speed.y += d
 
-        self.angle += self.angular_speed * Engine.deltatime
+        self.set_angle(self.angle + self.angular_speed * Engine.deltatime)
+
+    def set_angle(self, new_angle):
+        limit = 360
+        if new_angle < 0:
+            limit = -limit
+        self.angle = new_angle % limit
 
     def get_alpha(self):
         return self.am + self.aa
@@ -133,7 +137,7 @@ class Visual(Gizmo):
         )
 
     def hardlight_rgb(self, r, g, b):
-        self.ra, self.ga, self.ba = 0
+        self.ra = self.ga =self.ba = 0
         self.rm = r
         self.gm = g
         self.bm = b
@@ -152,9 +156,9 @@ class Visual(Gizmo):
     def overlap_point(self, x, y):
         return (
             x >= self.x
-            and x < self.x + self.width * self.__scale.x
+            and x < self.x + self.width * self.scale.x
             and y >= self.y
-            and y < self.y + self.height * self.__scale.y
+            and y < self.y + self.height * self.scale.y
         )
 
     def overlap_screen_point(self, x, y):

@@ -40,7 +40,7 @@ class Engine:
 
     @classmethod
     def system_exit(cls):
-        raise exit(0)
+        raise SystemExit
 
     @classmethod
     def draw_scene(cls):
@@ -62,6 +62,5 @@ class Engine:
             if cls.scene is not None:
                 cls.scene.update()
                 cls.draw_scene()
-
             pygame.display.update()
             cls.clock_tick()

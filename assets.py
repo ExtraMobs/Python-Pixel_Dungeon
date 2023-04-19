@@ -1,3 +1,6 @@
+from utils.resourcecache import ResourceCache
+
+
 class Assets:
     ARCS_BG = "arcs1.png"
     ARCS_FG = "arcs2.png"
