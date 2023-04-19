@@ -1,5 +1,6 @@
 import pygame
 
+import utils.cache as cache
 from assets import Assets
 from gameengine.display import Display
 from gameengine.engine import Engine
@@ -52,6 +53,7 @@ class TitleScene(PixelScene):
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         if Engine.request_quit:
+            cache.save()
             Engine.system_exit()
 
     def place_torch(self, x, y):
@@ -110,7 +112,6 @@ class TitleScene(PixelScene):
 
         def update(self):
             super().update()
-
             if self.pressed:
                 self.image.brightness(1.5)
             else:

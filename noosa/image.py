@@ -1,10 +1,8 @@
-from functools import lru_cache
-
 import pygame
 
 from gameengine.display import Display
 from noosa.visual import Visual
-import pygame
+from utils.cache import cache_color, cache_surface
 
 
 class Image(Visual):
@@ -39,21 +37,14 @@ class Image(Visual):
                 self.apply_scale()
 
     def apply_scale(self):
-        @lru_cache
-        def scale_surface(surface_buffer, surface_size, x, y):
-            return pygame.transform.scale_by(
-                pygame.image.frombytes(surface_buffer, surface_size, "RGBA"), (x, y)
-            )
+        @cache_surface
+        def scale_surface(surface, x, y):
+            return pygame.transform.scale_by(surface, (x, y))
 
-        self.texture = scale_surface(
-            pygame.image.tobytes(self.texture, "RGBA"),
-            self.texture.get_size(),
-            self.scale.x,
-            self.scale.y,
-        )
+        self.texture = scale_surface(self.texture, self.scale.x, self.scale.y)
 
     def apply_colors(self):
-        @lru_cache(None)
+        @cache_color
         def get_color(rgba, rmgmbmam, ragabaaa):
             r, g, b, a = rgba
             rm, gm, bm, am = rmgmbmam
@@ -78,13 +69,25 @@ class Image(Visual):
 
                 r, g, b, a = get_color(
                     (*color, alpha),
-                    (self.rm, self.gm, self.bm, self.am),
-                    (self.ra, self.ga, self.ba, self.aa),
+                    (
+                        round(self.rm, 2),
+                        round(self.gm, 2),
+                        round(self.bm, 2),
+                        round(self.am, 2),
+                    ),
+                    (
+                        round(self.ra, 2),
+                        round(self.ga, 2),
+                        round(self.ba, 2),
+                        round(self.aa, 2),
+                    ),
                 )
                 color[0] = r
                 color[1] = g
                 color[2] = b
                 img_alpha[x][y] = a
+            elif x > self.int_frame.x and y > self.int_frame.y:
+                break
         del img
         del img_alpha
 
