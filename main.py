@@ -10,7 +10,8 @@ class PixelDungeon(Program):
             Window(
                 title="Pixel Dungeon [Pygame]",
                 size=(1280, 720),
-            )
+            ),
+            framerate=60,
         )
 
         assets.load_files()
