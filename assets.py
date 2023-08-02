@@ -1,6 +1,5 @@
 import os
 from enum import Enum
-from pprint import pp
 
 from gameengine import resources
 
