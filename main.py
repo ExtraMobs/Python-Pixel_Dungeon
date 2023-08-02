@@ -1,3 +1,4 @@
+import assets
 from gameengine.core.program import Program
 from gameengine.core.window import Window
 from scenes.titlescene import TitleScene
@@ -11,6 +12,8 @@ class PixelDungeon(Program):
                 size=(1280, 720),
             )
         )
+
+        assets.load_files()
 
         self.set_scene(TitleScene())
 
