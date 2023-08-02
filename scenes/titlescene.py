@@ -1,11 +1,10 @@
 import enum
 import math
 
-from assets import Assets
+from assets import Assets, BannerSprites
 from gameengine import resources
-from gameengine.nodes.basenode import BaseNode
-from gameengine.nodes.basescene import BaseScene
 from gameengine.nodes.graphicnode import GraphicNode
+from scenes.pixelscene import PixelScene
 
 
 class ArcsChunk(GraphicNode):
@@ -63,43 +62,27 @@ class ArcsChunk(GraphicNode):
             self.rect.y -= self.arc_h
 
 
-class PixelScene(BaseScene):
-    MIN_WIDTH_P = 128
-    MIN_HEIGHT_P = 224
+class DashBoardItem:
+    SIZE = 48
 
-    MIN_WIDTH_L = 224
-    MIN_HEIGHT_L = 160
 
-    default_zoom = 0
-
-    window_density = 1  # temp
-
+class Title(GraphicNode):
     def __init__(self):
-        super().__init__()
+        super().__init__(resources.surface.get(BannerSprites.PIXEL_DUNGEON))
+        height = (
+            self.rect.h + DashBoardItem.SIZE
+            if self.program.display.is_landscape
+            else DashBoardItem.SIZE * 2
+        )
 
-        min_width = min_height = None
-        if self.program.display.is_landscape:
-            min_width = self.MIN_WIDTH_L
-            min_height = self.MIN_HEIGHT_L
-        else:
-            min_width = self.MIN_WIDTH_P
-            min_height = self.MIN_HEIGHT_P
-
-        self.default_zoom = math.ceil(self.window_density * 2.5)
-        while (
-            (self.program.display.width / self.default_zoom < min_width)
-            or (self.program.display.height / self.default_zoom < min_height)
-        ) and self.default_zoom > 1:
-            self.default_zoom -= 1
-
-        self.min_zoom = 1
-        self.max_zoom = self.default_zoom * 2
-
-        self.program.display.set_scale(self.default_zoom)
+        self.rect.x = (self.program.display.width - self.rect.width) / 2
+        self.rect.y = (self.program.display.height - height) / 2
 
 
 class TitleScene(PixelScene):
     def __init__(self):
         super().__init__()
 
-        self.add_children(ArcsChunk(ArcsChunk.BG, True), ArcsChunk(ArcsChunk.FG, True))
+        self.add_children(
+            ArcsChunk(ArcsChunk.BG, True), ArcsChunk(ArcsChunk.FG, True), Title()
+        )
