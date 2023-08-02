@@ -1,7 +1,12 @@
-from utils.resourcecache import ResourceCache
+import enum
+import os
+
+import pygame
+
+from gameengine import resources
 
 
-class Assets:
+class Assets(enum.Enum):
     ARCS_BG = "arcs1.png"
     ARCS_FG = "arcs2.png"
     DASHBOARD = "dashboard.png"
@@ -133,3 +138,42 @@ class Assets:
     SND_BEE = "snd_bee.mp3"
     SND_DEGRADE = "snd_degrade.mp3"
     SND_MIMIC = "snd_mimic.mp3"
+
+
+class BannerSprites(enum.Enum):
+    PIXEL_DUNGEON = enum.auto()
+    BOSS_SLAIN = enum.auto()
+    GAME_OVER = enum.auto()
+    SELECT_YOUR_HERO = enum.auto()
+    PIXEL_DUNGEON_SIGNS = enum.auto()
+
+
+def load_files():
+    for asset_var in Assets.__members__.values():
+        ext = os.path.splitext(asset_var.value)[-1]
+        path = os.path.join("assets\\", asset_var.value)
+        if ext == ".png":
+            resources.surface.add_from_file(asset_var, path)
+        elif ext == ".mp3":
+            resources.sound.add_from_file(asset_var, path)
+
+    resources.surface.set(
+        BannerSprites.PIXEL_DUNGEON,
+        resources.surface.slice(Assets.BANNERS, pygame.Rect(0, 0, 128, 70))[0],
+    )
+    resources.surface.set(
+        BannerSprites.BOSS_SLAIN,
+        resources.surface.slice(Assets.BANNERS, pygame.Rect(0, 70, 128, 35))[0],
+    )
+    resources.surface.set(
+        BannerSprites.GAME_OVER,
+        resources.surface.slice(Assets.BANNERS, pygame.Rect(0, 105, 128, 35))[0],
+    )
+    resources.surface.set(
+        BannerSprites.SELECT_YOUR_HERO,
+        resources.surface.slice(Assets.BANNERS, pygame.Rect(0, 140, 128, 21))[0],
+    )
+    resources.surface.set(
+        BannerSprites.PIXEL_DUNGEON_SIGNS,
+        resources.surface.slice(Assets.BANNERS, pygame.Rect(0, 161, 128, 57))[0],
+    )

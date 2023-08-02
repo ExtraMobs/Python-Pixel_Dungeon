@@ -1,116 +1,88 @@
-import pygame
+import enum
+import math
 
-from assets import Assets
-from gameengine.display import Display
-from gameengine.engine import Engine
-from gameengine.resources import Resources
-from noosa.camera import Camera
-from noosa.image import Image
-from noosa.ui.button import Button
-from pixeldungeon.effects.bannersprites import BannerSprites
-from pixeldungeon.effects.fireball import Fireball
-from pixeldungeon.ui.archs import Archs
+from assets import Assets, BannerSprites
+from gameengine import resources
+from gameengine.nodes.graphicnode import GraphicNode
 from scenes.pixelscene import PixelScene
-from utils.resourcecache import ResourceCache
+
+
+class ArcsChunk(GraphicNode):
+    SCROLL_SPEED = 20
+
+    BG = enum.auto()
+    FG = enum.auto()
+
+    def __init__(self, arch_type, reversed):
+        self.reversed = reversed
+        if arch_type == self.BG:
+            arch_id = Assets.ARCS_BG
+        elif arch_type == self.FG:
+            arch_id = Assets.ARCS_FG
+        else:
+            raise Exception("Invalid 'arch_type' parameter.")
+
+        if arch_type == self.FG:
+            self.SCROLL_SPEED *= 2
+
+        arc_surface = resources.surface.get(arch_id)
+        self.arc_w, self.arc_h = arc_surface.get_size()
+
+        chunk_w = math.ceil(self.program.display.width / self.arc_w) + 1
+        chunk_h = math.ceil(self.program.display.height / self.arc_h) + 1
+
+        super().__init__(
+            resources.surface.new(
+                size=(
+                    chunk_w * self.arc_w,
+                    chunk_h * self.arc_h,
+                )
+            )
+        )
+
+        for y in range(chunk_h):
+            y *= self.arc_h
+            for x in range(chunk_w):
+                x *= self.arc_w
+                self.surface.blit(arc_surface, (x, y))
+
+        self.rect.center = self.program.display.rect.center
+
+    def update(self):
+        shift = self.program.time.delta * self.SCROLL_SPEED
+
+        if self.reversed:
+            shift = -shift
+
+        self.rect.y += shift
+
+        if self.rect.y < -self.arc_h:
+            self.rect.y += self.arc_h
+        elif self.rect.y > 0:
+            self.rect.y -= self.arc_h
+
+
+class DashBoardItem:
+    SIZE = 48
+
+
+class Title(GraphicNode):
+    def __init__(self):
+        super().__init__(resources.surface.get(BannerSprites.PIXEL_DUNGEON))
+        height = (
+            self.rect.h + DashBoardItem.SIZE
+            if self.program.display.is_landscape
+            else DashBoardItem.SIZE * 2
+        )
+
+        self.rect.x = (self.program.display.width - self.rect.width) / 2
+        self.rect.y = (self.program.display.height - height) / 2
 
 
 class TitleScene(PixelScene):
-    TXT_PLAY = "Play"
-    TXT_HIGHSCORES = "Rankings"
-    TXT_BADGES = "Badges"
-    TXT_ABOUT = "About"
+    def __init__(self):
+        super().__init__()
 
-    def create(self):
-        super().create()
-
-        # TODO
-        # Music.INSTANCE.play( Assets.THEME, true );
-        # Music.INSTANCE.volume( 1f );
-
-        self.ui_camera.visible = False
-
-        w = Camera.main.width
-        h = Camera.main.height
-
-        archs = Archs()
-        archs.set_size(w, h)
-        self.add(archs)
-
-        title = Image(BannerSprites.get(BannerSprites.Type.PIXEL_DUNGEON))
-        self.add(title)
-        height = (
-            title.height + self.DashboardItem.SIZE
-            if Display.is_landscape()
-            else self.DashboardItem.SIZE * 2
+        self.add_children(
+            ArcsChunk(ArcsChunk.BG, True), ArcsChunk(ArcsChunk.FG, True), Title()
         )
-
-        title.x = (w - title.get_width()) / 2
-        title.y = (h - height) / 2
-
-        self.place_torch(title.x + 18, title.y + 20)
-
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        if Engine.request_quit:
-            Engine.system_exit()
-
-    def place_torch(self, x, y):
-        fb = Fireball()
-        fb.set_pos(x, y)
-        self.add(fb)
-
-    class DashboardItem(Button):
-        SIZE = 48
-
-        IMAGE_SIZE = 32
-
-        image = None
-        label = None
-
-        def __init__(self, text, index) -> None:
-            super().__init__()
-
-            self.image = Image(
-                Resources.Surface.slice(
-                    Assets.DASHBOARD,
-                    pygame.Rect(
-                        index * self.IMAGE_SIZE,
-                        0,
-                        (index + 1) * self.IMAGE_SIZE,
-                        self.IMAGE_SIZE,
-                    ),
-                ).copy()
-            )
-            self.add(self.image)
-
-            self.add(self.label)
-            self.label.text(text)
-            self.label.measure()
-
-            self.set_size(self.SIZE, self.SIZE)
-
-        def create_children(self):
-            super().create_children()
-
-            self.image = ResourceCache.get(Assets.DASHBOARD)
-            self.label = PixelScene.create_text(None, 9)
-
-        def layout(self):
-            super().layout()
-
-            self.image.x = PixelScene.align(
-                pos=self.x + (self.width - self.image.get_width()) / 2
-            )
-            self.image.y = PixelScene.align(self.y)
-
-            self.label.x = PixelScene.align(
-                pos=self.x + (self.width - self.label.get_width()) / 2
-            )
-            self.label.y = PixelScene.align(self.image.y + self.image.get_height() + 2)
-
-        def update(self):
-            super().update()
-            if self.pressed:
-                self.image.brightness(1.5)
-            else:
-                self.image.reset_color()

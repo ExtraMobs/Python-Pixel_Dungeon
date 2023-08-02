@@ -1,19 +1,23 @@
-from gameengine.display import Display
-from gameengine.engine import Engine
-from gameengine.window import Window
+import assets
+from gameengine.core.program import Program
+from gameengine.core.window import Window
 from scenes.titlescene import TitleScene
 
 
-def main():
-    Window.set_title("Pixel Dungeon [Python]")
-    Window.set_size((1280, 720))
-    Display.update_display_from_window()
-    scene = TitleScene()
-    scene.create()
-    Engine.set_scene(scene)
-    Engine.set_framerate(60)
-    Engine.start_loop()
+class PixelDungeon(Program):
+    def __init__(self):
+        super().__init__(
+            Window(
+                title="Pixel Dungeon [Pygame]",
+                size=(1280, 720),
+            ),
+            framerate=60,
+        )
+
+        assets.load_files()
+
+        self.set_scene(TitleScene())
 
 
 if __name__ == "__main__":
-    main()
+    PixelDungeon().start_loop()
