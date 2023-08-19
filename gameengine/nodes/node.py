@@ -6,8 +6,8 @@ if TYPE_CHECKING:
     from gameengine.generics import Program
 
 
-class BaseNode:
-    parent: "BaseNode"
+class Node:
+    parent: "Node"
     program: "Program"
 
     def __init__(self, *children) -> None:

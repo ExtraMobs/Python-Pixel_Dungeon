@@ -1,9 +1,9 @@
 import math
 
-from gameengine.nodes.basescene import BaseScene
+from gameengine.nodes.scene import Scene
 
 
-class PixelScene(BaseScene):
+class PixelScene(Scene):
     MIN_WIDTH_P = 128
     MIN_HEIGHT_P = 224
 

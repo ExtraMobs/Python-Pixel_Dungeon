@@ -1,7 +1,7 @@
 from gameengine.nodes.graphicnode import ShadingNode
 
 
-class BaseScene(ShadingNode):
+class Scene(ShadingNode):
     bg = (0, 0, 0)
 
     def __init__(self, *children):

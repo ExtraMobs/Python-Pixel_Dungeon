@@ -1,7 +1,7 @@
-from ..nodes.basenode import BaseNode
+from ..nodes.node import Node
 
 
-class Timer(BaseNode):
+class Timer(Node):
     def __init__(self, target_time, auto_pause=True):
         super().__init__()
         self.auto_pause = auto_pause

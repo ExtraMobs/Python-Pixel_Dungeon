@@ -1,6 +1,6 @@
 import pygame
 
-from ..utils.animation import Animation
+from ..misc.animation import Animation
 from .shadingnode import ShadingNode
 
 

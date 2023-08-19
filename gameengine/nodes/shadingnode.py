@@ -1,9 +1,9 @@
 import pygame
 
-from .basenode import BaseNode
+from .node import Node
 
 
-class ShadingManager(BaseNode):
+class ShadingManager(Node):
     def draw(self, surf: pygame.Surface) -> None:
         for shader in self.children:
             shader.draw(
@@ -13,7 +13,7 @@ class ShadingManager(BaseNode):
             )
 
 
-class ShadingNode(BaseNode):
+class ShadingNode(Node):
     def __init__(self, *children) -> None:
         super().__init__(*children)
         self.shader_manager = ShadingManager()
