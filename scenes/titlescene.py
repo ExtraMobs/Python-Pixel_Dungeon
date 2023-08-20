@@ -1,6 +1,8 @@
 import enum
 import math
 
+import pygame
+
 from assets import Assets, BannerSprites
 from gameengine import resources
 from gameengine.nodes.graphicnode import GraphicNode
@@ -82,6 +84,9 @@ class Title(GraphicNode):
 class TitleScene(PixelScene):
     def __init__(self):
         super().__init__()
+
+        pygame.mixer.Channel(0).play(resources.sound.get(Assets.THEME), -1)
+        pygame.mixer.Channel(0).set_volume(1)
 
         self.add_children(
             ArcsChunk(ArcsChunk.BG, True), ArcsChunk(ArcsChunk.FG, True), Title()

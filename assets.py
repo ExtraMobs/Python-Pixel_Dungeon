@@ -157,6 +157,7 @@ def load_files():
         elif ext == ".mp3":
             resources.sound.add_from_file(asset_var, path)
 
+    # BannerSprites
     resources.surface.set(
         BannerSprites.PIXEL_DUNGEON,
         resources.surface.slice(Assets.BANNERS, pygame.Rect(0, 0, 128, 70))[0],
