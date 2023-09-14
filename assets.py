@@ -148,6 +148,13 @@ class BannerSprites(enum.Enum):
     PIXEL_DUNGEON_SIGNS = enum.auto()
 
 
+class Flames(enum.Enum):
+    BLIGHT = enum.auto()
+    FLIGHT = enum.auto()
+    FLAME1 = enum.auto()
+    FLAME2 = enum.auto()
+
+
 def load_files():
     for asset_var in Assets.__members__.values():
         ext = os.path.splitext(asset_var.value)[-1]
@@ -177,4 +184,22 @@ def load_files():
     resources.surface.set(
         BannerSprites.PIXEL_DUNGEON_SIGNS,
         resources.surface.slice(Assets.BANNERS, pygame.Rect(0, 161, 128, 57))[0],
+    )
+
+    # Flames
+    resources.surface.set(
+        Flames.BLIGHT,
+        resources.surface.slice(Assets.FIREBALL, pygame.Rect(0, 0, 32, 32))[0],
+    )
+    resources.surface.set(
+        Flames.FLIGHT,
+        resources.surface.slice(Assets.FIREBALL, pygame.Rect(32, 0, 32, 32))[0],
+    )
+    resources.surface.set(
+        Flames.FLAME1,
+        resources.surface.slice(Assets.FIREBALL, pygame.Rect(64, 0, 32, 32))[0],
+    )
+    resources.surface.set(
+        Flames.FLAME2,
+        resources.surface.slice(Assets.FIREBALL, pygame.Rect(96, 0, 32, 32))[0],
     )

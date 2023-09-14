@@ -23,18 +23,24 @@ def add_from_file(name: Any, path: str, alpha=True) -> None:
 
 
 def set(name: Any, surface: pygame.Surface, copy=False) -> None:
+    if type(name) is pygame.Surface:
+        raise Exception("The name cannot be a pygame surface.")
     if copy:
         surface = surface.copy()
     surfaces[name] = surface
 
 
-def slice(name: Any, *rects) -> pygame.Surface:
-    surface = get(name)
+def slice(asset: Any, *rects) -> pygame.Surface:
+    surface = get(asset)
     return [surface.subsurface(rect).copy() for rect in rects]
 
 
-def get(name: Any, copy=True) -> pygame.Surface:
-    surface = surfaces[name]
+def get(asset: Any, copy=True) -> pygame.Surface:
+    if type(asset) is pygame.Surface:
+        surface = asset
+    else:
+        surface = surfaces[asset]
+
     if copy:
         return surface.copy()
     else:

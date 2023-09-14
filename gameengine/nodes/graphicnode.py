@@ -26,26 +26,28 @@ class Rotation:
 class UpdateManager:
     def __init__(self, graphic_node):
         self.node = graphic_node
-
+        self.surface_id = id(self.node.surface)
         self.animation_frame = None
         self.rotation_angle = None
 
     def update(self):
         animation_updated = False
-        if self.node.animation is not None:
-            self.node.animation.update()
-            if (
-                animation_updated := (
-                    new_animation_frame := self.node.animation.frame_index
-                )
-                != self.animation_frame
-            ):
-                self.node.surface = self.node.animation.current_frame
-                self.animation_frame = new_animation_frame
+        if is_same_surf := (self.surface_id == id(self.node.surface)):
+            if self.node.animation is not None:
+                self.node.animation.update()
+                if (
+                    animation_updated := (
+                        new_animation_frame := self.node.animation.frame_index
+                    )
+                    != self.animation_frame
+                ):
+                    self.node.surface = self.node.animation.current_frame
+                    self.surface_id = id(self.node.surface)
+                    self.animation_frame = new_animation_frame
 
-        if (
-            rotation_updated := (new_rotation_angle := self.node.rotation.angle)
-            != self.rotation_angle
+        if rotation_updated := (
+            (new_rotation_angle := self.node.rotation.angle) != self.rotation_angle
+            or not is_same_surf
         ):
             self.node.rotation.update(self)
             self.rotation_angle = new_rotation_angle
@@ -92,16 +94,16 @@ class GraphicNode(ShadingNode):
             self.__update_manager.update()
             super().update()
 
-    def draw(self):
+    def draw(self, surface=None):
         if self.visible:
             self.shader_manager.draw(self.surface)
             self.hitbox.update(self.surface, self.rect)
-            if self.bg is not None:
-                self.surface.fill(self.bg)
 
             super().draw()
 
-            self.parent.surface.blit(
+            if surface is None:
+                surface = self.parent.surface
+            surface.blit(
                 self.surface,
                 (self.rect.x + self.offset.x, self.rect.y + self.offset.y),
             )

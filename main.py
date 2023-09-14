@@ -15,7 +15,6 @@ class PixelDungeon(Program):
         )
 
         assets.load_files()
-
         self.set_scene(TitleScene())
 
 
